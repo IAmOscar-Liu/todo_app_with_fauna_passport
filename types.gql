@@ -1,0 +1,35 @@
+type Todo {
+  user_id: String!
+  title: String!
+  note: String!
+  created_at: String!
+  updated_at: String
+  completed: Boolean!
+}
+
+type Account {
+  profile_id: String
+  userName: String!
+  email: String!
+}
+
+
+type Query {
+  allTodos: [Todo!]
+  GetAllTodosSortedByCreatedAt: [Todo!] @resolver(paginated: true)
+  GetAllCompletedTodoSortedByCreatedAt: [Todo!] @resolver(paginated: true)
+}
+
+type UserInfo @embedded {
+  secret: String
+  data: Account 
+}
+
+type Mutation {
+  addTodo(user_id: String!, title: String!, note: String!): Todo @resolver
+  completeTodo(id: String!, user_id: String!): Todo @resolver
+  deleteTodo(id: String!, user_id: String!): Todo @resolver
+  login(email: String!, password: String!): UserInfo @resolver
+  register(userName: String!, email: String!, password: String!): Account @resolver
+  logout: Boolean @resolver
+}

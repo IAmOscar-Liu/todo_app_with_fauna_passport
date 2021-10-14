@@ -1,0 +1,11 @@
+mutation Login($email: String!, $password: String!) {
+  login(email: $email, password: $password) {
+    secret
+    data {
+      _id
+      userName
+      profile_id
+      email
+    }
+  }
+}

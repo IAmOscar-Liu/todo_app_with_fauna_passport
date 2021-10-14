@@ -1,0 +1,11 @@
+mutation CompleteTodo($id: String!, $user_id: String!) {
+  completeTodo(id: $id, user_id: $user_id ) {
+    _id
+    user_id
+    title
+    note
+    updated_at
+    created_at
+    completed
+  }
+}

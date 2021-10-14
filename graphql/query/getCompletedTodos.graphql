@@ -1,0 +1,13 @@
+query GetCompletedTodos {
+  GetAllCompletedTodoSortedByCreatedAt {
+    data {
+      _id
+      user_id
+      title
+      note
+      created_at
+      updated_at
+      completed
+    }
+  }
+}

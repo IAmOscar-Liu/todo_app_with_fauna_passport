@@ -1,0 +1,12 @@
+overwrite: true
+schema:
+  - https://graphql.fauna.com/graphql:
+      headers:
+        Authorization: "Bearer fnAETs3NEmACQe03z4aPsoAxwK0W-O4bQ2HVmrQq"
+documents: "graphql/**/*.graphql"
+generates:
+  generated/graphql.tsx:
+    plugins:
+      - "typescript"
+      - "typescript-operations"
+      - "typescript-react-apollo"

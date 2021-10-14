@@ -1,0 +1,115 @@
+addTodo: 
+
+Query(
+  Lambda(
+    ["user_id", "title", "note"],
+    Create(Collection("Todo"), {
+      data: {
+        user_id: Var("user_id"),
+        title: Var("title"),
+        note: Var("note"),
+        created_at: ToString(Now()),
+        updated_at: ToString(Now()),
+        completed: false
+      }
+    })
+  )
+)
+
+GetAllTodosSortedByCreatedAt
+
+Query(
+  Lambda(
+    "_",
+    Map(
+      Paginate(Match(Index("all_Todos_sorted_by_createdAt"))),
+      Lambda(["created_at", "ref"], Get(Var("ref")))
+    )
+  )
+)
+
+GetAllCompletedTodoSortedByCreatedAtall_Todos_sorted_by_createdAt_v2
+
+Query(
+  Lambda(
+    "_",
+    Filter(
+      Map(
+        Paginate(Match(Index("all_Todos_sorted_by_createdAt"))),
+        Lambda(["created_at", "ref"], Get(Var("ref")))
+      ),
+      Lambda(["filterRef"], Select(["data", "completed"], Var("filterRef")))
+    )
+  )
+)
+
+completeTodo
+
+Query(
+  Lambda(
+    ["id", "user_id"],
+    Let(
+      { updateRef: Ref(Collection("Todo"), Var("id")) },
+      If(
+        Not(Exists(Var("updateRef"))),
+        Abort("Todo doesn't exist"),
+        If(
+          Not(
+            Equals(
+              Var("user_id"),
+              Select(["data", "user_id"], Get(Var("updateRef")))
+            )
+          ),
+          Abort("Cannot update the todo which is not yours"),
+          Update(Var("updateRef"), {
+            data: { completed: true, updated_at: ToString(Now()) }
+          })
+        )
+      )
+    )
+  )
+)
+
+deleteTodo
+
+Query(
+  Lambda(
+    ["id", "user_id"],
+    Let(
+      { deleteRef: Ref(Collection("Todo"), Var("id")) },
+      If(
+        Not(Exists(Var("deleteRef"))),
+        Abort("Todo doesn't exist"),
+        If(
+          Not(
+            Equals(
+              Var("user_id"),
+              Select(["data", "user_id"], Get(Var("deleteRef")))
+            )
+          ),
+          Abort("Cannot delete the todo which is not yours"),
+          Delete(Ref(Collection("Todo"), Var("id")))
+        )
+      )
+    )
+  )
+)
+
+indexes
+all_Todos_sorted_by_createdAt
+
+{
+  name: "all_Todos_sorted_by_createdAt",
+  serialized: true,
+  source: Collection("Todo"),
+  terms: [],
+  values: [
+    {
+      field: ["data", "created_at"],
+      reverse: true
+    },
+    {
+      field: ["ref"]
+    }
+  ]
+}
