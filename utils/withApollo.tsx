@@ -10,6 +10,16 @@ import { createWithApollo } from "./createWithApollo";
 import { getLoginSession } from "../lib/auth";
 import { getFaunadbAccountToken } from "../lib/user";
 
+export const getStandAloneApolloClient = async () => {
+  return new ApolloClient({
+    uri: process.env.NEXT_PUBLIC_FAUDADB_GRAPHQL_ENDPOINT,
+    headers: {
+      authorization: `Bearer ${process.env.NEXT_PUBLIC_FAUNADB_USER_KEY}`,
+    },
+    cache: new InMemoryCache(),
+  });
+};
+
 const createClient = (ctx: NextPageContext) => {
   const httpLink = new HttpLink({
     uri: process.env.NEXT_PUBLIC_FAUDADB_GRAPHQL_ENDPOINT, // "https://graphql.us.fauna.com/graphql",
@@ -31,7 +41,7 @@ const createClient = (ctx: NextPageContext) => {
         } else {
           // client side
           console.log("get accessToken on client");
-          return await getFaunadbAccountToken("/api/user")
+          return await getFaunadbAccountToken("/api/user");
         }
       } catch (e) {
         console.log("Error");
